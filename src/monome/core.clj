@@ -1,4 +1,4 @@
-(ns monomes.core
+(ns monome.core
   (:require [monome-serial.core :as monome-core]
             [monome-serial.event-handlers :as handlers]
             [monome.polynome :as poly]
@@ -8,8 +8,8 @@
 
 (def known-monome-paths [["/dev/tty.usbserial-m0000965" 16 8]
                          ["/dev/tty.usbserial-m64-0790" 8 8]
-                         ["/dev/cu.usbserial-m0000965"  16 8]
-                         ["/dev/tty.usbserial-m0000965" 16 8]])
+                         ["/dev/tty.usbserial-m128-115" 16 8]
+                         ["/dev/tty.usbserial-m256-203" 16 16]])
 
 (defn decorate-monome
   [m width height path]
