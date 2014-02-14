@@ -51,25 +51,21 @@
 (defn handle-monome-press
   [m x y]
   (when-let [[f fx fy] (first (monome->fonomes m x y))]
-    (println "fp" fx fy)
     (fn/press f fx fy)))
 
 (defn handle-monome-release
   [m x y]
   (when-let [[f fx fy] (first (monome->fonomes m x y))]
-        (println "fr" fx fy)
     (fn/release f fx fy)))
 
 (defn handle-led-on
   [f x y]
   (when-let [[m mx my] (first (fonome->monomes f x y))]
-        (println "mon" mx my)
     (monome/led-on m (int mx) (int my))))
 
 (defn handle-led-off
   [f x y]
   (when-let [[m mx my] (first (fonome->monomes f x y))]
-        (println "moff" mx my)
     (monome/led-off m (int mx) (int my))))
 
 (defn dock-fonome!
