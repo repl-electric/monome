@@ -361,3 +361,7 @@
   (ensure-valid-led-state! f new-state)
   (send (:state f) replace-led-state* f new-state)
   f)
+
+(defn set-led-row-state! [f y new-row]
+  (dotimes [x (range 0 (count new-row))]
+    (send (:state f) led-off* f x y (nth new-row x))))
