@@ -199,6 +199,36 @@
               (event [:fonome :led-off (:id s)] (assoc event-msg :x x :y y)))))))
     (assoc s :history new-history)))
 
+(defn- replace-led-row-in-state*
+  [s f y new-row-led-state]
+  (let [ts          (now)
+        old-leds    (:leds s)
+        new-led-state (conj old-leds new-row-led-state)
+        s           (assoc s :leds new-led-state)
+        e           {:ts ts :action :led-update :state (dissoc s :history :id :width :height)}
+        new-history (cons e (take history-size (:history s)))
+        event-msg   {:ts ts
+                     :action :led-update
+                     :state  s
+                     :fonome f
+                     :old-leds old-leds
+                     :new-leds new-led-state
+                     :event e}]
+    (event [:fonome :led-change (:id s)] event-msg)
+    (doseq [x (range (:width s))
+            y (range (:height s))]
+      (let [old-led (get old-leds [x y] false)
+            new-led (get new-led-state [x y] false)]
+        (when (not= old-led new-led)
+          (if new-led
+            (do
+              (event [:fonome :led-on (:id s) x y] (assoc event-msg :x x :y y))
+              (event [:fonome :led-on (:id s)] (assoc event-msg :x x :y y)))
+            (do
+              (event [:fonome :led-off (:id s) x y] (assoc event-msg :x x :y y))
+              (event [:fonome :led-off (:id s)] (assoc event-msg :x x :y y)))))))
+    (assoc s :history new-history)))
+
 (defn- toggle-led*
   [s f x y]
   (if (get (:leds s) [x y])
@@ -363,5 +393,7 @@
   f)
 
 (defn set-led-row-state! [f y new-row]
-  (dotimes [x (range 0 (count new-row))]
-    (send (:state f) led-off* f x y (nth new-row x))))
+  (let [new-state (reduce (fn [row-state [x cell]]
+                            (merge row-state {[x y] (boolean (= 1 (nth new-row x)))}))
+                          {} (map vector (range) new-row))]
+    (send (:state f) replace-led-row-in-state* f y new-state)))
